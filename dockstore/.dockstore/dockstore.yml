@@ -1,0 +1,58 @@
+template: Hello, %s!
+quayClientID: UCHAT770I5BLY1JHJG5Y
+quayRedirectURI: http://localhost:9000/auth/quay.io
+githubClientID: 7cf8d69b1fa05becc17a
+githubClientSecret: 6628b8b840ba5f194e784cdb628b87b82121e45e
+githubRedirectURI: http://localhost:9000/login
+bitbucketClientID: asC4DsDuv9ZbvrVBBh
+bitbucketClientSecret:  Pz6wj55m3VtZqnDgLphBhrC69zSFH5mx
+hostname: localhost
+scheme: https
+port: 8080
+
+authenticationCachePolicy: maximumSize=10000, expireAfterAccess=10m
+
+httpClient:
+  timeout: 5500ms
+  connectionTimeout: 5500ms
+  timeToLive: 1h
+  cookiesEnabled: false
+  maxConnections: 1024
+  maxConnectionsPerRoute: 1024
+  keepAlive: 0ms
+  retries: 0
+
+database:
+  # the name of your JDBC driver
+  driverClass: org.postgresql.Driver
+
+  # the username
+  user: webservice
+
+  # the password
+  password: iAMs00perSecrEET
+
+  # the JDBC URL
+  url: jdbc:postgresql://localhost:5432/webservice
+
+  # any properties specific to your JDBC driver:
+  properties:
+    charSet: UTF-8
+    hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    # create database as needed, disable in production
+    hibernate.hbm2ddl.auto: create
+
+  # the maximum amount of time to wait on an empty pool before throwing an exception
+  maxWaitForConnection: 1s
+
+  # the SQL query to run when validating a connection's liveness
+  validationQuery: "/* MyApplication Health Check */ SELECT 1"
+
+  # the minimum number of connections to keep open
+  minSize: 8
+
+  # the maximum number of connections to keep open
+  maxSize: 32
+
+  # whether or not idle connections should be validated
+  checkConnectionWhileIdle: false

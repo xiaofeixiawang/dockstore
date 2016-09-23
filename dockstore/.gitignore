@@ -1,0 +1,55 @@
+*.iml
+.idea
+*.class
+*.swp
+*.sql
+
+*.gradle
+gradle.properties
+AndroidManifest.xml
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+/target/
+dependency-reduced-pom.xml
+hello-world.yml
+dockstore-webservice/target/
+dockstore-client/target/
+dockstore-launcher/target/
+dockstore-launcher/foo.json
+swagger-java-client/build.gradle
+swagger-java-client/gradle.properties
+swagger-java-client/settings.gradle
+swagger-java-client/target/
+swagger-java-quay-client/target/
+dockstore-webservice/nbactions.xml
+dockstore-common/target/
+dockstore-integration-testing/target/
+dockstore-integration-testing/cromwell-executions/
+dockstore-integration-testing/cromwell-input/
+dockstore-integration-testing/datastore/
+
+# confidential testing files
+# The dockstore CLI config file for testing confidential data
+dockstore-integration-testing/src/test/resources/config_file.txt
+dockstore-integration-testing/src/test/resources/config_file2.txt
+
+# Contains SQL statements to initialize testing DB with a confidential user and tokens
+dockstore-integration-testing/src/test/resources/db_confidential_dump.sql
+
+# Contains SQL statements to initialize testing DB with a confidential user, assuming they followed the dockstore setup tutorial
+dockstore-integration-testing/src/test/resources/db_confidential_dump_full.sql
+
+# The dockstore.yml file for running the confidential tests
+dockstore-integration-testing/src/test/resources/dockstoreTest.yml
+
+# The tarball of the above three confidential files
+dockstore-integration-testing/src/test/resources/secrets.tar

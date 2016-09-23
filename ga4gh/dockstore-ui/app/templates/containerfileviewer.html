@@ -1,0 +1,33 @@
+<div class="ds-holder">
+  <div class="ds-version-selector">
+    <strong>Container Version</strong>:
+    <select class="ds-version" ng-model="selTagName">
+      <option
+        ng-repeat="tag in containerTags"
+        value="{{tag}}">
+        {{tag}}
+      </option>
+    </select>
+  </div>
+  <div class="ds-descriptor-selector" ng-hide="isDockerfile()">
+    <strong>Descriptor Type</strong>:
+    <select class="ds-descriptor" ng-model="selDescriptorName">
+      <option
+        ng-repeat="descriptor in descriptors"
+        value="{{descriptor}}">
+        {{descriptor}}
+      </option>
+    </select>
+  </div>
+</div>
+
+<div class="alert alert-warning" role="alert"
+    ng-show="fileLoaded && !fileContents">
+  <span class="glyphicon glyphicon-warning-sign"></span>&nbsp;
+  A {{expectedFilename}} associated with this Docker container could not be found.
+</div>
+<div hljs
+    source="fileContents"
+    hljs-language="yaml"
+    ng-show="fileLoaded && fileContents">
+</div>

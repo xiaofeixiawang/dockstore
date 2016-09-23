@@ -1,0 +1,95 @@
+<div id="container-table">
+  <div class="container" ng-class="{'ds-page-mh' : !previewMode}">
+    <div class="row">
+      <div class="col-md-12">
+        <table class="homepage-container containers-grid">
+          <thead>
+            <tr>
+              <th>
+                Name
+                <span class="glyphicon"
+                      ng-class="getIconClass('name')"
+                      ng-click="clickSortColumn('name')">
+                </span>
+              </th>
+              <th>
+                Author
+                <span class="glyphicon"
+                      ng-class="getIconClass('author')"
+                      ng-click="clickSortColumn('author')">
+                </span>
+              </th>
+              <th>
+                Project Links
+              </th>
+              <th>
+                Docker Pull
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-show="filteredContainers.length === 0">
+              <td colspan="4">
+                <div class="text-center">No Records Found</div>
+              </td>
+            </tr>
+            <!-- need a to write a 'smart search' filter -->
+            <tr ng-repeat="container in ((filteredContainers = (containers | PreviewFilter:contLimit | filter: searchQueryContainer)) | orderBy:sortColumn:sortReverse | PaginationFilter:getListRange())">
+              <td>
+                <a href="{{(container.isRemote ? 'https://dockstore.org/' : '')}}containers/{{container.path + (container.toolname ? '/' + container.toolname : '')}}">{{container.name + (container.toolname ? ' (' + container.toolname + ')' : '')}}</a>
+                <img ng-show="{{container.isRemote}}" src="/images/star-outline.png" />
+              </td>
+              <td>
+                {{ container.author ? container.author : 'n/a' }}
+              </td>
+              <td ng-init="gitReposProvider = getGitReposProvider(container.gitUrl); imageReposProvider = getImageReposProvider(container.path)">
+                <span
+                    ng-init="gitReposWebUrl = getGitReposWebUrl(container.gitUrl, gitReposProvider)">
+                  <a ng-href="{{gitReposWebUrl}}"
+                      target="_blank"
+                      ng-if="gitReposWebUrl">
+                    {{getGitReposProviderName(gitReposProvider)}}</a>
+                </span>
+                <span
+                    ng-init="imageReposWebUrl = getImageReposWebUrl(container.path, imageReposProvider)">
+                  <a ng-href="{{imageReposWebUrl}}"
+                      target="_blank"
+                      ng-if="imageReposWebUrl">
+                    {{getImageReposProviderName(imageReposProvider)}}</a>
+                </span>
+              </td>
+              <td ng-init="dockerPullCmd = getDockerPullCmd(container.path)">
+                <div copy-text>{{dockerPullCmd}}</div>
+              </td>
+            </tr>
+            <tr ng-show="previewMode && filteredContainers.length !== 0">
+              <td colspan="4" class="browse-all">
+                <div class="button">
+                  <p><a href="/search-containers">Browse All Tools &raquo;</a></p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="container-pagination" ng-show="!previewMode">
+  <div class="container">
+    <div class="row-center">
+        <ul class="pagination">
+          <li>{{getListRangeString()}}</li>
+          <li>
+            <div class="button" ng-hide="currPage <= getFirstPage()">
+              <p><a href ng-click="changePage(false)">&laquo; Previous</a></p>
+            </div>
+            <div class="button" ng-hide="currPage >= getLastPage()">
+              <p><a href ng-click="changePage(true)">Next &raquo;</a></p>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+</div>

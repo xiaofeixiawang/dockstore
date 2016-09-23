@@ -1,0 +1,350 @@
+<div class="row" ng-if="containerDetailsError || refreshingContainer">
+  <div class="col-md-12">
+    <div class="alert alert-danger alert-dismissable"
+        ng-class="!editMode ? 'push-top' : ''"
+        role="alert"
+        ng-if="containerDetailsError">
+      <button type="button"
+          class="close"
+          data-dismiss="alert"
+          ng-click="setContainerDetailsError(null)">
+        &times;
+      </button>
+      <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        {{containerDetailsError.message}}
+      </p>
+      <p class="error-output">{{containerDetailsError.errorDetails}}</p>
+    </div>
+    <div class="alert alert-info"
+        role="alert"
+        ng-if="refreshingContainer">
+      <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate">
+      </span>
+      Please wait, retrieving {{imageReposProviderName}} container...
+    </div>
+  </div>
+</div>
+<div class="row" ng-show="containerObj">
+  <div ng-class="editMode ? 'col-md-7' : 'col-md-8'">
+    <h3>
+      <!--<span class="glyphicon glyphicon-lock" ng-if="!containerObj.is_public"></span>-->
+      {{
+        (containerObj.namespace !== '_' ? containerObj.namespace + '/' : '') +
+        containerObj.name +
+        (containerObj.toolname ? ' (' + containerObj.toolname + ')' : '')
+      }}
+    </h3>
+    <div ng-if="containerObj" id="label-holder">
+      <div id="label-values">
+        <span ng-show="checkOverflow()" class="label label-default container-label" id="label-button" ng-click="selectLabelTab()">View All</span>
+
+      <span class="label label-default container-label"
+            ng-repeat="label in getContainerLabelStrings(containerObj.labels)" id="{{label}}">
+        <a ng-href="/search-containers/{{label}}">
+          {{label}}
+        </a>
+        <span ng-if="$first">
+        <span ng-show="false">
+          {{moveToStart(label)}}
+          </span>
+        </span>
+      </span>
+        </div>
+    </div>
+
+    <p class="update">
+      Last build:
+      {{ containerObj.lastBuild ? getDaysAgoString(containerObj.lastBuild) : 'n/a' }}
+    </p>
+  </div>
+  <div class="col-md-5"
+      ng-if="editMode">
+    <h3>
+      <div class="pull-right">
+        <div class="btn-group" role="group">
+          <button uib-btn-checkbox
+              type="button"
+              class="btn btn-primary"
+              ng-click="setContainerRegistration(containerObj.id, containerObj.is_published)"
+              ng-model="containerObj.is_published"
+              ng-class="containerObj.is_published ? 'btn-primary' : 'btn-warning'"
+              ng-disabled="refreshingContainer">
+            {{ containerObj.is_published ? 'Unpublish' : 'Publish' }}
+          </button>
+          <button type="button"
+              class="btn btn-danger"
+              ng-click="deregisterContainer(containerObj.id)"
+              ng-if="containerObj.mode === 'MANUAL_IMAGE_PATH'">
+            Deregister
+          </button>
+        </div>
+        <button type="button"
+            class="btn btn-primary"
+            ng-click="refreshContainer(containerObj.id)"
+            ng-disabled="refreshingContainer">
+          Refresh
+        </button>
+      </div>
+    </h3>
+  </div>
+  <div class="col-md-4"
+      ng-if="containerObj.email">
+    <h3 class="pull-right">
+      <div class="btn-group" role="group">
+        <button type="button"
+            class="btn btn-primary contact-button"
+            ng-if="!editMode && !containerObj.is_published">
+          <a href="mailto:{{containerObj.email}}?subject=Dockstore Request for Access to {{containerObj.path}}&body=I would like to request access to your Docker image {{containerObj.path}} housed on {{gitReposProviderName}}.  My username on {{gitReposProviderName}} is <username>.">
+            Request Access
+          </a>
+        </button>
+        <button type="button"
+            class="btn btn-info contact-button"
+            ng-if="!editMode">
+          <a href="mailto:{{containerObj.email}}?subject=Dockstore Contact Request About: {{containerObj.path}}">
+            Contact Author
+          </a>
+        </button>
+      </div>
+    </h3>
+  </div>
+  <!--div class="col-md-2">
+    <span class="starRating">
+      <input id="rating5" type="radio" name="rating" value="5">
+      <label for="rating5">5</label>
+      <input id="rating4" type="radio" name="rating" value="4">
+      <label for="rating4">4</label>
+      <input id="rating3" type="radio" name="rating" value="3" checked>
+      <label for="rating3">3</label>
+      <input id="rating2" type="radio" name="rating" value="2">
+      <label for="rating2">2</label>
+      <input id="rating1" type="radio" name="rating" value="1">
+      <label for="rating1">1</label>
+    </span>
+  </div-->
+</div>
+<div class="row" ng-show="containerObj">
+  <div class="ds-tabs" ng-class="editMode ? 'col-md-12' : 'col-md-9'">
+    <uib-tabset>
+      <uib-tab active="activeTabs[0]">
+        <uib-tab-heading>Info</uib-tab-heading>
+        <ul class="list-unstyled container-info">
+          <li>
+            <strong>Name</strong>:
+            {{containerObj.name + (containerObj.toolname ? ' (' + containerObj.toolname + ')' : '')}}
+          </li>
+          <li>
+            <strong>Path</strong>:
+            {{containerObj.path}}
+          </li>
+          <li>
+            <strong>Author</strong>:
+            {{ containerObj.author ? containerObj.author : 'n/a' }}
+          </li>
+          <li>
+            <strong>E-mail</strong>:
+            <span ng-if="!containerObj.email">n/a</span>
+            <a href="mailto:{{containerObj.email}}"
+                ng-if="containerObj.email">
+              {{containerObj.email}}
+            </a>
+          </li>
+          <li ng-if="gitReposProvider">
+            <strong>{{gitReposProviderName}}</strong>:
+            <span ng-if="!gitReposProvider">n/a</span>
+            <span ng-if="gitReposWebUrl">
+              <a ng-href="{{gitReposWebUrl}}" target="_blank">
+                {{gitReposWebUrl}}
+              </a>
+            </span>
+          </li>
+          <li ng-if="imageReposProvider">
+            <strong>{{imageReposProviderName}}</strong>:
+            <span ng-if="!imageReposWebUrl">n/a</span>
+            <span ng-if="imageReposWebUrl">
+              <a ng-href="{{imageReposWebUrl}}" target="_blank">
+                {{imageReposWebUrl}}
+              </a>
+            </span>
+          </li>
+          <li>
+            <strong>Build Mode</strong>:
+            {{getContainerModeString(containerObj.mode)}}
+          </li>
+          <li>
+            <strong>Last Build</strong>:
+            {{ containerObj.lastBuild ? getDateTimeString(containerObj.lastBuild) : 'n/a' }}
+          </li>
+          <li>
+            <strong>Last Update</strong>:
+            {{ containerObj.lastUpdated ? getDateTimeString(containerObj.lastUpdated) : 'n/a' }}
+          </li>
+          <li>
+            <strong>Description</strong>:
+            <div class="well well-sm">
+              <div
+                  ng-show="containerObj.description"
+                  marked="containerObj.description">
+              </div>
+              <span ng-show="!containerObj.description">
+                No description associated with this container.
+              </span>
+            </div>
+          </li>
+        </ul>
+        <div ng-if="!editMode">
+          <hr />
+          <div disqus-comments class="comments" ng-if="!editMode"></div>
+        </div>
+      </uib-tab>
+      <uib-tab active="activeTabs[1]">
+        <uib-tab-heading>Labels</uib-tab-heading>
+        <button type="sbutton"
+            class="btn btn-link pull-right"
+            ng-if="editMode && !labelsEditMode"
+            ng-click="toggleLabelsEditMode()">
+          <span class="glyphicon glyphicon-edit"></span>Edit
+        </button>
+        <ul class="list-unstyled container-info" ng-show="!labelsEditMode">
+          <li ng-if="containerObj">
+            <strong>Labels:</strong>
+            <span ng-show="containerObj.labels.length === 0">n/a</span>
+            <span class="label label-default container-label"
+                  ng-repeat="label in getContainerLabelStrings(containerObj.labels)">
+              <a ng-href="/search-containers/{{label}}">
+                {{label}}
+              </a>
+            </span>
+          </li>
+        </ul>
+        <form name="editContainerForm"
+            class="edit-container form-inline"
+            ng-submit="submitContainerEdits()"
+            novalidate>
+          <button type="submit"
+              class="btn btn-link pull-right"
+              ng-disabled="editContainerForm.$invalid"
+              ng-if="editMode && labelsEditMode">
+            <span class="glyphicon glyphicon-floppy-save"></span>Save
+          </button>
+          <div ng-show="labelsEditMode">
+            <div class="form-group">
+              <label>Container Labels:</label>
+              <input
+                  type="text"
+                  class="input-sm form-control"
+                  name="contLabels"
+                  ng-model="containerEditData.labels"
+                  ng-pattern="/^(|\s*([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*)(\s*,\s*([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*))*\s*)$/i"
+                  ng-maxlength="512"
+                  placeholder="e.g. dockstore, oicr-icgc, pancancer" />
+              <div
+                  class="form-error-messages"
+                  ng-messages="editContainerForm.contLabels.$error"
+                  ng-if="editContainerForm.contLabels.$touched">
+                <div ng-messages-include="templates/validation/containers/labels.html">
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </uib-tab>
+      <uib-tab  active="activeTabs[2]">
+        <uib-tab-heading>Versions</uib-tab-heading>
+        <div versions-grid
+            container-obj="containerObj"
+            edit-mode="editMode"
+            set-error="setContainerDetailsError">
+        </div>
+      </uib-tab>
+      <uib-tab active="activeTabs[3]">
+        <uib-tab-heading>Dockerfile</uib-tab-heading>
+        <div container-file-viewer
+            type="dockerfile"
+            container-obj="containerObj"
+            ng-if="containerObj">
+        </div>
+      </uib-tab>
+      <uib-tab active="activeTabs[4]">
+        <uib-tab-heading>Descriptor</uib-tab-heading>
+        <div container-file-viewer
+            type="descriptor"
+            container-obj="containerObj"
+            ng-if="containerObj">
+        </div>
+      </uib-tab>
+    </uib-tabset>
+  </div>
+  <div class="side-block col-md-3" ng-if="!editMode">
+    <table ng-if="containerObj">
+      <thead>
+        <th>
+          <h3>Docker Pull Command</h3>
+        </th>
+      </thead>
+      <tbody>
+        <tr>
+          <td ng-init="dockerPullCmd = getDockerPullCmd(containerObj.path)">
+            <div copy-text>{{dockerPullCmd}}</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+        <th>
+          <h3>Source Repositories</h3>
+        </th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="container-source-repos">
+              <p>
+                <span ng-if="gitReposProvider">
+                  <a ng-href="{{gitReposWebUrl}}" target="_blank">
+                    {{gitReposProviderName}}
+                    <span class="glyphicon glyphicon-new-window"></span>
+                  </a>
+                </span>
+              </p>
+              <p>
+                <span ng-if="imageReposProvider">
+                  <a ng-href="{{imageReposWebUrl}}" target="_blank">
+                    {{imageReposProviderName}}
+                    <span class="glyphicon glyphicon-new-window"></span>
+                  </a>
+                </span>
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table ng-if="containerObj">
+      <thead>
+        <th>
+          <h3>Sharing</h3>
+        </th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+          <div class="container-sharing">
+              <sn-addthis-toolbox
+                  class="addthis_toolbox addthis_default_style addthis_32x32_style">
+                <a href class="addthis_button_twitter"></a>
+                <a href class="addthis_button_facebook"></a>
+                <a href class="addthis_button_google_plusone_share"></a>
+                <a href class="addthis_button_evernote"></a>
+                <a href class="addthis_button_email"></a>
+              </sn-addthis-toolbox>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

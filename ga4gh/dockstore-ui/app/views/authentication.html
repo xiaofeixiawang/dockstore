@@ -1,0 +1,73 @@
+<div id="container-header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h3 class="available-containers">
+          Token Authentication
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container view-content">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      
+        <h3>Authentication Provider: {{providerName}}</h3>
+        <hr />
+
+        <div class="alert alert-danger" role="alert" ng-if="errorMsg">
+          <span class="glyphicon glyphicon-remove-sign"> {{errorMsg}}
+        </div>
+        <button
+        		type="button"
+        		class="btn btn-primary ds-btn pull-right"
+        		ng-if="errorMsg">
+        	<a href="/login">Return to Login</a>
+        </button>
+
+				<div class="alert alert-info" role="alert" ng-if="refreshingContainers">
+          <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate">
+          </span>
+          Please wait, retrieving {{providerName}} containers...
+        </div>
+        <p ng-if="!errorMsg">
+        	Completing authentication process for {{providerName}}, you will be redirected momentarily...
+        </p>
+
+    </div>
+  </div>
+</div>
+
+<div id="our-sponsors">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="our-sponsors">
+          <li>In Affiliation With:</li>
+          <li>
+            <a href="https://www.cancercollaboratory.org/" target="_blank">
+              <img src="images/collaboratory.png" />
+            </a>
+          </li>
+          <li>
+            <a href="https://oicr.on.ca/" target="_blank">
+              <img src="images/oicr.png" />
+            </a>
+          </li>
+          <li>
+            <a href="https://genomicsandhealth.org/" target="_blank">
+              <img src="images/ga4gh.png" />
+            </a>
+          </li>
+          <li>
+            <a href="http://www.commonwl.org/" target="_blank">
+              <img src="images/cwl.png" />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
